@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>FastBot 自动化测试</title>
+
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.6.0.js"></script>
+
+    <style>
+        body {
+            background: #ebebeb;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        div {
+            margin: 0 auto;
+            display: inline-block;
+            text-align: left;
+        }
+
+        span {
+            width: 120px;
+            display: inline-block;
+            text-align: left;
+        }
+
+        h3 {
+            text-align: center;
+        }
+    </style>
+
+    <script>
+
+        //运行测试
+        function runTest() {
+            // apkfile = document.getElementById("apk_path").value
+            devicesName = document.getElementById("device_name").value;
+            packageName = document.getElementById("package_name").value;
+            time = document.getElementById("time").value;
+
+            url = "http://10.1.14.210:5000/runTest?deviceName=" + devicesName + "&packageName=" + packageName + "&times=" + time;
+
+            $.get(url).done(function (data) {
+                data
+            })
+        }
+
+        //获取设备名称
+        function getDevices() {
+            $.get("http://10.1.14.210:5000/getDevices").done(function (data) {
+                document.getElementById("device_list").innerText = "设备列表:\n" + data
+            })
+        }
+
+        //检查安装apk
+        function checkIsInstall() {
+            packageName = document.getElementById("package_name").value;
+            $.get("http://10.1.14.210:5000/checkInstall?packageName=" + packageName).done(function (data) {
+
+                let map = Object.keys(data).map(key => [key, data[key]]);
+
+                for (let i = 0; i < map.length; i++) {
+                    let isInstall = "未安装";
+                    if (map[i][1]) {
+                        isInstall = "已安装"
+                    } else {
+                        isInstall = "未安装"
+                    }
+
+                    alert("设备:" + map[i][0] + "-" + isInstall)
+                }
+            })
+        }
+    </script>
+
+</head>
+
+<body>
+
+
+<div>
+    <h3>FastBot 自动化测试</h3>
+    <span>1.请输入包名:</span>
+    <input type="text" id="package_name"/>
+    <button onclick="checkIsInstall()">检查是否安装</button>
+    </p>
+
+    <p id="uploadApk"></p>
+
+    <span>2.输入设备名称</span> <input type="text" id="device_name"/> (参见下方设备列表)</p>
+
+
+    <span>3.请输入测试时长</span> <input type="text" id="time"/> (单位:分钟) </p>
+
+    <span>&nbsp;</span>
+    <button type="button" onclick="runTest()" style="margin-left: 5px;">开始执行</button>
+    </p>
+
+    <span>已连接设备:</span> </p>
+
+    <ul id="devicesList">
+
+    </ul>
+
+    <span>使用说明:</span> </p>
+    <ul>
+        <li> 1.请先检查需要测试的应用是否在手机上已安装</li>
+        <li> 2.设备名称请填写已列出的可用设备名称</li>
+        <li> 3.请保证你要测试的应用已登录</li>
+    </ul>
+
+    <span>遗留问题:</span> </p>
+
+    <ul>
+        <li> 1.暂不支持屏蔽指定控件,页面(如:屏蔽退出登录功能)</li>
+        <li> 2.暂不支持自动输入（如:自动登录）</li>
+    </ul>
+
+    </br>
+    更多功能可以参加:<a href="https://github.com/bytedance/Fastbot_Android" target="view_window">Fastbot_Android</a>
+
+</div>
+
+<script>
+    $.get("http://10.1.14.210:5000/getDevices").done(function (data) {
+        let map = Object.keys(data).map(key => [key, data[key]]);
+
+        for (var key in map) {
+            let node = document.createElement("LI");
+            let resultText = map[key] + "";
+            let message = resultText.split(",");
+            let isWorking = "";
+
+            if (message[1] === 'true') {
+                isWorking = "正在使用"
+            } else {
+                isWorking = "当前可用"
+            }
+
+            let textNode = document.createTextNode(message[0] + " - " + isWorking);
+            node.appendChild(textNode);
+
+            document.getElementById("devicesList").appendChild(node)
+        }
+    })
+</script>
+
+</body>
+
+</html>
