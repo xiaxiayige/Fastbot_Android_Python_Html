@@ -7,3 +7,7 @@
 	http://10.1.14.210:5000/index.html
 	
 # 3.请根据提示进行测试操作
+
+# 4.配合钉钉机器人使用 可以接收到测试结果 
+
+	修改 'adbTools.py' 代码里面的 ding_ding_hook_url 为你自己的钉钉机器人的WebhookUrl
